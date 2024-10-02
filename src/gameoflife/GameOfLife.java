@@ -262,11 +262,12 @@ public class GameOfLife {
       return row >= 0 && row < width - 1 && col >= 0 && col < height - 1;
     }
 
+    /*
+    * 判断坐标是否在板子内部，也就是是否合法*/
     public boolean checkSiteValid(int[] arr) {
         int row = arr[0];
         int col = arr[1];
-                //对输入的数据判断,抛出异常
-      return row >= 0 && row < width - 1 && col >= 0 && col < height - 1;
+        return row >= 0 && row < width - 1 && col >= 0 && col < height - 1;
     }
     /**
      * 实现一个判断周围有多少个存活cell的函数.
@@ -276,30 +277,25 @@ public class GameOfLife {
      * 否则应该返回的值为[0,1,2,3,4]
      * */
     public int liveCellCount(int row,int col,TETile[][] curGen) {
-        if (!checkSiteValid(row,col)) return -1;
-        //获取周围八个site的值，然后求和，注意valid
-        int sum = 0;
-        //创建一个数组用来求周围的点的坐标
-        int [][] sites = new int[8][2];
-        sites[0] = new int[]{row - 1,col};
-        sites[1] = new int[]{row + 1,col};
-        sites[2] = new int[]{row,col - 1};
-        sites[3] = new int[]{row,col + 1};
-        sites[4] = new int[]{row - 1,col - 1};
-        sites[5] = new int[]{row - 1,col + 1};
-        sites[6] = new int[]{row + 1,col - 1};
-        sites[7] = new int[]{row + 1,col + 1};
+    if (!checkSiteValid(row, col)) return -1;
 
-        for (int[] i:sites) {
-            if (checkSiteValid(i)) {
-                int x = i[0];
-                int y = i[1];
-                //获取值
-                if (curGen[x][y] == Tileset.CELL) {
-                    sum++;
-                }
+    int sum = 0;
+
+    // 定义邻居的偏移量
+    int[] rowOffsets = {-1, -1, -1, 0, 0, 1, 1, 1};
+    int[] colOffsets = {-1, 0, 1, -1, 1, -1, 0, 1};
+
+    for (int i = 0; i < 8; i++) {
+        int newRow = row + rowOffsets[i];
+        int newCol = col + colOffsets[i];
+
+        // 直接检查邻居是否有效
+        if (newRow >= 0 && newRow < curGen.length && newCol >= 0 && newCol < curGen[0].length) {
+            if (curGen[newRow][newCol] == Tileset.CELL) {
+                sum++;
             }
         }
+    }
         return sum;
     }
 
