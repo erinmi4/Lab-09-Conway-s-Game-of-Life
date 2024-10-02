@@ -231,48 +231,46 @@ public class GameOfLife {
      * @return
      * 对于规则的使用，不是按照一个一个来的，而是一次就做出了判断
      */
-public TETile[][] nextGeneration(TETile[][] tiles) {
-    TETile[][] nextGen = new TETile[width][height];
-    TETile[][] curGen = returnCurrentState();
+    public TETile[][] nextGeneration(TETile[][] tiles) {
+        TETile[][] nextGen = new TETile[width][height];
+        // The board is filled with Tileset.NOTHING
+        fillWithNothing(nextGen);
 
-    // 避免重复计算 liveCellCount
-    for (int x = 0; x < width; x++) {
-        for (int y = 0; y < height ; y++) {
-            int liveNeighbors = liveCellCount(x, y, curGen);
+        // TODO: Implement this method so that the described transitions occur.
+        // TODO: The current state is represented by TETiles[][] tiles and the next
+        // TODO: state/evolution should be returned in TETile[][] nextGen.
+        TETile[][] curGen = returnCurrentState();
 
-            // 当前是活细胞
-            if (curGen[x][y] == Tileset.CELL) {
-                if (liveNeighbors < 2 || liveNeighbors > 3) {
-                    nextGen[x][y] = Tileset.NOTHING;  // 死亡
-                } else {
-                    nextGen[x][y] = Tileset.CELL;  // 继续存活
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height ; y++) {
+                if (curGen[x][y] == Tileset.CELL) {
+                    if (liveCellCount(x, y,curGen) < 2 || liveCellCount(x, y, curGen)  > 3) nextGen[x][y] = Tileset.NOTHING;
+                    else nextGen[x][y] = Tileset.CELL;
                 }
-            }
-            // 当前是死细胞
-            else {
-                if (liveNeighbors == 3) {
-                    nextGen[x][y] = Tileset.CELL;  // 复活
-                } else {
-                    nextGen[x][y] = Tileset.NOTHING;  // 继续保持死亡
+                else {
+                    if (liveCellCount(x, y, curGen)  == 3) nextGen[x][y] = Tileset.CELL;
+                    else nextGen[x][y] = Tileset.NOTHING;
                 }
             }
         }
+        // TODO: Returns the next evolution in TETile[][] nextGen.返回数组，里面装的是下一次的状态
+        return nextGen;
     }
-//打印板子，判断预期
-    nextGen = flip(nextGen);
-
-    printBoard(nextGen);
-
-    return nextGen;
-}
-
 
     /**
      * 实现对于一个坐标的valid判断*/
-public boolean checkSiteValid(int row, int col) {
-    return row >= 0 && row < width && col >= 0 && col < height;
-}
+    public boolean checkSiteValid(int row, int col) {
+                //对输入的数据判断,抛出异常
+      return row >= 0 && row < width - 1 && col >= 0 && col < height - 1;
+    }
 
+    /*
+    * 判断坐标是否在板子内部，也就是是否合法*/
+    public boolean checkSiteValid(int[] arr) {
+        int row = arr[0];
+        int col = arr[1];
+        return row >= 0 && row < width - 1 && col >= 0 && col < height - 1;
+    }
     /**
      * 实现一个判断周围有多少个存活cell的函数.
      * @Parameter row 行坐标X
@@ -280,11 +278,12 @@ public boolean checkSiteValid(int row, int col) {
      * 如果传入的是一个不存在的点，会返回-1，
      * 否则应该返回的值为[0,1,2,3,4]
      * */
-public int liveCellCount(int row, int col, TETile[][] curGen) {
+    public int liveCellCount(int row,int col,TETile[][] curGen) {
     if (!checkSiteValid(row, col)) return -1;
 
     int sum = 0;
 
+    // 定义邻居的偏移量
     int[] rowOffsets = {-1, -1, -1, 0, 0, 1, 1, 1};
     int[] colOffsets = {-1, 0, 1, -1, 1, -1, 0, 1};
 
@@ -292,19 +291,15 @@ public int liveCellCount(int row, int col, TETile[][] curGen) {
         int newRow = row + rowOffsets[i];
         int newCol = col + colOffsets[i];
 
+        // 直接检查邻居是否有效
         if (newRow >= 0 && newRow < curGen.length && newCol >= 0 && newCol < curGen[0].length) {
             if (curGen[newRow][newCol] == Tileset.CELL) {
                 sum++;
             }
         }
     }
-
-    // 调试输出，查看每次计算的活细胞数
-    //System.out.println("Live cells around (" + row + ", " + col + "): " + sum);
-
-    return sum;
-}
-
+        return sum;
+    }
 
     /**
      * Helper method for saveBoard without rendering and running the game.
@@ -376,51 +371,6 @@ public int liveCellCount(int row, int col, TETile[][] curGen) {
         // TODO: Return the board you loaded. Replace/delete this line.
         return null;
     }
-    /*沿着x轴水平翻转*/
-public TETile[][] flipVertically(TETile[][] tiles) {
-    int width = tiles.length;
-    int height = tiles[0].length;
-
-    TETile[][] flipped = new TETile[width][height];
-
-    for (int x = 0; x < width; x++) {
-        for (int y = 0; y < height; y++) {
-            flipped[x][y] = tiles[x][height - 1 - y];  // 将第y行和倒数第y行互换
-        }
-    }
-
-    return flipped;
-}
-
-/*将板子旋转90°*/
-public TETile[][] rotate90Degrees(TETile[][] board) {
-    int width = board.length;
-    int height = board[0].length;
-    TETile[][] rotated = new TETile[height][width];
-
-    for (int x = 0; x < width; x++) {
-        for (int y = 0; y < height; y++) {
-            rotated[y][width - 1 - x] = board[x][y];
-        }
-    }
-
-    return rotated;
-}
-
-    /*
-* 将板子打印出来*/
-public void printBoard(TETile[][] board) {
-    for (int y = 0; y < board[0].length; y++) {  // 遍历每一行
-        for (int x = 0; x < board.length; x++) {  // 遍历每一列
-            if (board[x][y] == Tileset.CELL) {
-                System.out.print("1");  // 用 '1' 表示活细胞
-            } else if (board[x][y] == Tileset.NOTHING) {
-                System.out.print("0");  // 用 '0' 表示空细胞
-            }
-        }
-        System.out.println();  // 打印一行后换行
-    }
-}
 
     /**
      * This is where we run the program. DO NOT MODIFY THIS METHOD!
@@ -442,5 +392,3 @@ public void printBoard(TETile[][] board) {
         }
     }
 }
-
-
