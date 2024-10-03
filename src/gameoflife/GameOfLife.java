@@ -362,31 +362,42 @@ public void saveBoard() {
      * Loads the board from filename and returns it in a 2D TETile array.
      * 0 represents NOTHING, 1 represents a CELL.
      */
-    public TETile[][] loadBoard(String filename) {
-        // TODO: Read in the file.
-        FileUtils newsave = new FileUtils();
-        if (!newsave.fileExists(filename)) {
-            //如果文件不存在，抛出错误
-            throw new IllegalArgumentException("File does not exist");
-        }
-        // TODO: Split the file based on the new line character.
-        newsave.readFile(filename);
-        // TODO: Grab and set the dimensions from the first line.
+public TETile[][] loadBoard(String filename) {
+    FileUtils newsave = new FileUtils();
 
-        // TODO: Create a TETile[][] to load the board from the file into
-        // TODO: and any additional variables that you think might help.
-
-
-        // TODO: Load the state of the board from the given filename. You can
-        // TODO: use the provided builder variable to help you and FileUtils
-        // TODO: functions. Make sure the orientation is correct!
-
-
-
-
-        // TODO: Return the board you loaded. Replace/delete this line.
-        return null;
+    // 如果文件不存在，抛出错误
+    if (!newsave.fileExists(filename)) {
+        throw new IllegalArgumentException("File does not exist");
     }
+
+    // 读取文件内容并根据换行符切割成行
+    String boardState = newsave.readFile(filename).toString();
+    String[] map = boardState.split("\\R");
+
+    // 从第一行提取棋盘的维度
+    int width = Integer.parseInt(map[0].split(" ")[0]);
+    int height = Integer.parseInt(map[0].split(" ")[1]);
+
+    // 创建一个二维数组来加载棋盘状态
+    TETile[][] loads = new TETile[width][height];
+
+    // 从文件的第二行开始加载棋盘状态，逐个字符处理每一行
+    for (int y = 0; y < height; y++) {
+        String row = map[y + 1];  // 每一行作为一个字符串
+        for (int x = 0; x < width; x++) {
+            char tileChar = row.charAt(x);  // 逐个字符处理
+            if (tileChar == '1') {
+                loads[x][y] = Tileset.CELL;  // 如果是 '1'，表示这个位置是活细胞
+            } else if (tileChar == '0') {
+                loads[x][y] = Tileset.NOTHING;  // 如果是 '0'，表示这个位置是空的
+            }
+        }
+    }
+
+    // 返回加载的棋盘
+    return loads;
+}
+
     /*沿着x轴水平翻转*/
 public TETile[][] flipVertically(TETile[][] tiles) {
     int width = tiles.length;
