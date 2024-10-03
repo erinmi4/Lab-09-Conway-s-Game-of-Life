@@ -233,7 +233,7 @@ public class GameOfLife {
      */
 public TETile[][] nextGeneration(TETile[][] tiles) {
     TETile[][] nextGen = new TETile[width][height];
-    TETile[][] curGen = returnCurrentState();
+    TETile[][] curGen = tiles;
 
     // 避免重复计算 liveCellCount
     for (int x = 0; x < width; x++) {
@@ -259,8 +259,10 @@ public TETile[][] nextGeneration(TETile[][] tiles) {
         }
     }
 //打印板子，判断预期
-    nextGen = flip(nextGen);
-
+//    nextGen = flip(nextGen);
+//    nextGen = rotate90Degrees(nextGen);
+//    nextGen = rotate90Degrees(nextGen);
+//    nextGen = rotate90Degrees(nextGen);
     printBoard(nextGen);
 
     return nextGen;
@@ -410,8 +412,8 @@ public TETile[][] rotate90Degrees(TETile[][] board) {
     /*
 * 将板子打印出来*/
 public void printBoard(TETile[][] board) {
-    for (int y = 0; y < board[0].length; y++) {  // 遍历每一行
-        for (int x = 0; x < board.length; x++) {  // 遍历每一列
+    for (int x = 0; x < board.length; x++) {  // 遍历每一行
+        for (int y = 0; y < board[0].length; y++) {  // 遍历每一列
             if (board[x][y] == Tileset.CELL) {
                 System.out.print("1");  // 用 '1' 表示活细胞
             } else if (board[x][y] == Tileset.NOTHING) {
