@@ -162,7 +162,8 @@ public class GameOfLifeTests {
 
         String f1 = newlineReplacer(Files.readString(Paths.get(SAVE_FILE)));
         String f2 = newlineReplacer(Files.readString(Paths.get(SAVE_TEST)));
-
+        System.out.println(f1);
+        System.out.println(f2);
         assertWithMessage("Checks that saving works and is as expected with the given seed.")
                 .that(f1.equals(f2)).isTrue();
     }
@@ -227,4 +228,6 @@ public class GameOfLifeTests {
         List<String> contents = br.lines().toList();
         return String.join(delimiter, contents).hashCode();
     }
+
 }
+

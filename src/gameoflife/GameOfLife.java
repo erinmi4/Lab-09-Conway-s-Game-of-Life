@@ -325,29 +325,38 @@ public int liveCellCount(int row, int col, TETile[][] curGen) {
      * save.txt file (make sure it's saved into this specific file).
      * 0 represents NOTHING, 1 represents a CELL.
      */
-    public void saveBoard() {
-        // TODO: Save the dimensions of the board into the first line of the file.
-        // TODO: The width and height should be separated by a space, and end with "\n".
-        FileUtils newsave = new FileUtils();
-        if (!newsave.fileExists(SAVE_FILE)) {
-            //如果文件不存在，抛出错误
-            throw new IllegalArgumentException("File does not exist");
-        }
-        String dimension = Integer.toString(width) +" "+Integer.toString(height) +"\n";
-        newsave.writeFile(SAVE_FILE,dimension);
-        // TODO: Save the current state of the board into save.txt. You should
-        // TODO: use the provided FileUtils functions to help you. Make sure
-        // TODO: the orientation is correct! Each line in the board should
-        // TODO: end with a new line character.
-        TETile[][] curGen = returnCurrentState();
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                if (curGen[x][y] == Tileset.CELL) newsave.writeFile(SAVE_FILE,"1 ");
-                else newsave.writeFile(SAVE_FILE,"0 ");
-                if (y == width - 1) newsave.writeFile(SAVE_FILE,"\n");
+public void saveBoard() {
+    // 获取当前的棋盘状态
+    TETile[][] curGen = returnCurrentState();
+
+    FileUtils newsave = new FileUtils();
+
+    // 如果文件不存在，抛出错误（也可以改为创建新文件）
+    if (!newsave.fileExists(SAVE_FILE)) {
+        throw new IllegalArgumentException("File does not exist");
+    }
+
+    // 写入棋盘的维度（宽度和高度），并以换行符结束
+    StringBuilder boardState = new StringBuilder();
+    boardState.append(width).append(" ").append(height).append("\n");
+
+    // 使用行优先顺序遍历棋盘，将状态存入 map
+    // 注意，遍历行时 y 从 0 到 height - 1，表示从下往上遍历
+    for (int y = height - 1; y >= 0; y--) {  // 从最后一行开始遍历
+        for (int x = 0; x < width; x++) {  // 遍历每一列
+            if (curGen[x][y] == Tileset.CELL) {
+                boardState.append("1");
+            } else {
+                boardState.append("0");
             }
         }
+        boardState.append("\n");  // 每行结束后添加换行符
     }
+
+    // 将所有内容一次性写入文件
+    newsave.writeFile(SAVE_FILE, boardState.toString());
+}
+
 
     /**
      * Loads the board from filename and returns it in a 2D TETile array.
